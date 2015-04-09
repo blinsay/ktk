@@ -97,14 +97,36 @@ func NewBufferedProducer(stream string, client kinesis.Kinesis, sendSize int) (*
 	return p, nil
 }
 
-func (b *BufferedProducer) Put(msg KinesisMessage) ([]FailedPut, error) {
-	// Fail fast on messages that can't be encoded. It's worth the extra storage
-	// to memoize results to know that encoding is busted sooner rather than later.
-	pkey, err := msg.PartitionKey()
+func validValue(msg KinesisMessage) ([]byte, error) {
+	val, err := msg.Value()
 	if err != nil {
 		return nil, err
 	}
-	val, err := msg.Value()
+	if len(val) == 0 {
+		return nil, fmt.Errorf("msg.Value must be at least 1 byte long")
+	}
+	return val, nil
+}
+
+func validPartitionKey(msg KinesisMessage) (*string, error) {
+	key, err := msg.PartitionKey()
+	if err != nil {
+		return nil, err
+	}
+	if len(*key) == 0 {
+		return nil, fmt.Errorf("msg.PartitionKey must be a non-empty string")
+	}
+	return key, nil
+}
+
+func (b *BufferedProducer) Put(msg KinesisMessage) ([]FailedPut, error) {
+	// Fail fast on messages that can't be encoded. It's worth the extra storage
+	// to memoize results to know that encoding is busted sooner rather than later.
+	pkey, err := validPartitionKey(msg)
+	if err != nil {
+		return nil, err
+	}
+	val, err := validValue(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -130,11 +152,10 @@ func (b *BufferedProducer) send() ([]FailedPut, error) {
 	// Build the request
 	entries := make([]*kinesis.PutRecordsRequestEntry, b.current)
 	for i := 0; i < b.current; i++ {
-		entry := &kinesis.PutRecordsRequestEntry{
+		entries[i] = &kinesis.PutRecordsRequestEntry{
 			PartitionKey: b.partitionKeys[i],
 			Data:         b.values[i],
 		}
-		entries = append(entries, entry)
 	}
 	input := &kinesis.PutRecordsInput{
 		StreamName: aws.String(b.StreamName),
