@@ -50,10 +50,17 @@ type FailedPut struct {
 // underlying client. A Producer may buffer data or send it to kinesis
 // asynchronously.
 type Producer interface {
+	// Send the given message to Kinesis at some point in the future. Put may
+	// return an error even if a send to Kinesis was not triggered if the message
+	// fails validation for any reason.
+	//
+	// If this put triggers sending messages to Kinesis, any number of messages
+	// previously passed to this client may fail and be returned.
 	Put(KinesisMessage) ([]*FailedPut, error)
 }
 
-// A producer that buffers data internally.
+// A producer that buffers data internally and sends one a batch of messages
+// reaches a specific size.
 //
 // This producer isn't safe to call from multiple Goroutines. Callers must
 // synchronize their own access to Put and Close.

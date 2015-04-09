@@ -5,14 +5,22 @@ import (
 	"log"
 )
 
+// A ktk sub-command to run. (e.g. cat)
 type Command struct {
-	Name        string
-	Usage       string
-	Short       string
+	// The name of the command.
+	Name string
+	// The command's usage string.
+	Usage string
+	// A short description of the command.
+	Short string
+	// A long help-style description of the command.
 	Description string
-	Run         func([]string)
+	// The function that should actually run when the command is called. Called
+	// with every command-line arg after the name of the command.
+	Run func([]string)
 }
 
+// Available commands
 var commands = []*Command{
 	catCommand,
 	listCommand,

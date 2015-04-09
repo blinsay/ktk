@@ -18,6 +18,8 @@ var catCommand = &Command{
 	Run: runCat,
 }
 
+// Handle any errors from producer.Put and maybe log them and exit. Is a no-op
+// if there were no failures.
 func handleErrs(failures []FailedPut, err error) {
 	if awserr := aws.Error(err); awserr != nil {
 		if len(awserr.Message) > 0 {
@@ -40,6 +42,11 @@ func handleErrs(failures []FailedPut, err error) {
 	// Do nothing
 }
 
+// Run the cat command with the given arguments.
+//
+// The name of the stream to send data to is required. Any other arguments are
+// filenames that should be sent line-by-line into Kinesis. If no files are
+// passed, data is sent from Stdin.
 func runCat(args []string) {
 	if len(args) < 1 {
 		log.Fatalln("error: no stream name given")

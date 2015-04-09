@@ -1,5 +1,7 @@
 package main
 
+// TODO(benl): Describe the streams instead of just listing names.
+
 import (
 	"log"
 
@@ -18,6 +20,7 @@ var listCommand = &Command{
 	Run: runList,
 }
 
+// List the names of all of the Kinesis streams.
 func runList(args []string) {
 	// Ignore args
 
