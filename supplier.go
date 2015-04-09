@@ -14,19 +14,6 @@ type ReaderSupplier interface {
 	Reader() (io.Reader, error)
 }
 
-// Return a ReaderSupplier of all of the files listed in os.Args[1:]. If there
-// are no files passsed on the command line, returns a one-shot supplier that
-// returns os.Stdin.
-//
-// Mimics Python's fileinput.input() or Ruby's ARGF.
-func GetInput() ReaderSupplier {
-	if len(os.Args) > 1 {
-		return &FileSupplier{filenames: os.Args[1:]}
-	}
-
-	return &StdinSupplier{}
-}
-
 // A ReaderSupplier that returns os.Stdin exactly once.
 type StdinSupplier struct {
 	returned bool
