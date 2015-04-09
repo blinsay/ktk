@@ -1,26 +1,48 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/kinesis"
 )
 
-func ListStreams(k *kinesis.Kinesis) []string {
+var listCommand = &Command{
+	Name:  "list",
+	Usage: "list",
+	Short: "list Kinesis streams",
+	Description: `
+
+	List the Kinesis streams associated with your account.
+	`,
+	Run: runList,
+}
+
+func runList(args []string) {
+	// Ignore args
+
+	streams, err := listStreams(kinesis.New(nil))
+	if awserr := aws.Error(err); awserr != nil {
+		log.Fatalf("error: %s: %s", awserr.Code, awserr.Message)
+	}
+	if err != nil {
+		log.Fatalln("kinesis client error:", err)
+	}
+
+	for _, stream := range streams {
+		log.Println(stream)
+	}
+}
+
+func listStreams(k *kinesis.Kinesis) ([]string, error) {
 	streams := make([]string, 0)
 	request := &kinesis.ListStreamsInput{Limit: aws.Long(1)}
 	hasMoreStreams := true
 
 	for hasMoreStreams {
 		resp, err := k.ListStreams(request)
-		if awsError := aws.Error(err); awsError != nil {
-			fmt.Println("error:", awsError.Code, awsError.Message)
-			os.Exit(1)
-		} else if err != nil {
-			fmt.Println("error:", err)
-			os.Exit(1)
+		if err != nil {
+			return nil, err
 		}
 
 		for _, streamName := range resp.StreamNames {
@@ -33,5 +55,5 @@ func ListStreams(k *kinesis.Kinesis) []string {
 		request.ExclusiveStartStreamName = resp.StreamNames[len(resp.StreamNames)-1]
 	}
 
-	return streams
+	return streams, nil
 }

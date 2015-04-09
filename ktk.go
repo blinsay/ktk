@@ -1,95 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/awslabs/aws-sdk-go/service/kinesis"
+	"flag"
+	"log"
 )
 
-const usage = "usage: ktk [list|cat]"
-
-func list() error {
-	for _, stream := range ListStreams(kinesis.New(nil)) {
-		fmt.Println(stream)
-	}
-
-	return nil
+type Command struct {
+	Name        string
+	Usage       string
+	Short       string
+	Description string
+	Run         func([]string)
 }
 
-func handleCatFailures(failures []FailedPut, err error) error {
-	if err != nil {
-		return err
-	}
-	if failures != nil {
-		errCounts := make(map[string]int)
-		for _, e := range failures {
-			errCounts[*e.ErrorCode]++
-		}
-		return fmt.Errorf("error: %d puts failed: %x", len(failures), errCounts)
-	}
-	return nil
+var commands = []*Command{
+	catCommand,
+	listCommand,
 }
 
-func cat(args []string) error {
-	if len(args) < 1 {
-		return fmt.Errorf("cat requires a stream name")
+func usage() {
+	log.Println("usage: ktk command [arguments...]")
+	log.Println()
+	log.Println("Valid commands:")
+
+	for _, cmd := range commands {
+		log.Printf("\t%s\t%s\n", cmd.Name, cmd.Short)
 	}
+}
 
-	stream := args[0]
-	inputFiles := args[1:]
-
-	var supplier ReaderSupplier
-	if len(inputFiles) == 0 {
-		supplier = &StdinSupplier{}
-	} else {
-		supplier = &FileSupplier{filenames: inputFiles}
-	}
-
-	producer, err := NewBufferedProducer(stream, *kinesis.New(nil), MaxSendSize)
-	if err != nil {
-		return err
-	}
-
-	scanner := NewMultiScanner(supplier)
-	for scanner.Scan() {
-		err := handleCatFailures(producer.Put(StringMessage(scanner.Text())))
-		if err != nil {
-			return err
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	if err := handleCatFailures(producer.Flush()); err != nil {
-		return err
-	}
-
-	return nil
+func init() {
+	log.SetFlags(0)
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, usage)
-		os.Exit(-1)
+	flag.Parse()
+	args := flag.Args()
+
+	if len(args) < 1 {
+		usage()
+		return
 	}
 
-	var err error
-	cmd := os.Args[1]
-	switch cmd {
-	case "cat":
-		err = cat(os.Args[2:])
-	case "list":
-		err = list()
-	default:
-		fmt.Fprintln(os.Stderr, usage)
-		os.Exit(-1)
+	for _, cmd := range commands {
+		if cmd.Name == args[0] {
+			cmd.Run(args[1:])
+			return
+		}
 	}
 
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "error:", err)
-		os.Exit(1)
-	}
+	usage()
 }
