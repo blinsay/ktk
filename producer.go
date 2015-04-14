@@ -156,6 +156,11 @@ func (b *BufferedProducer) Flush() ([]FailedPut, error) {
 }
 
 func (b *BufferedProducer) send() ([]FailedPut, error) {
+	// Don't send with no data.
+	if b.current == 0 {
+		return nil, nil
+	}
+
 	// Build the request
 	entries := make([]*kinesis.PutRecordsRequestEntry, b.current)
 	for i := 0; i < b.current; i++ {
