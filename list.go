@@ -39,7 +39,7 @@ func runList(args []string) {
 
 func listStreams(k *kinesis.Kinesis) ([]string, error) {
 	streams := make([]string, 0)
-	request := &kinesis.ListStreamsInput{Limit: aws.Long(1)}
+	request := &kinesis.ListStreamsInput{}
 	hasMoreStreams := true
 
 	for hasMoreStreams {
