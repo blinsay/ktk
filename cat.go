@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
+	"os"
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/kinesis"
@@ -55,19 +58,17 @@ func runCat(args []string) {
 	stream := args[0]
 	inputFiles := args[1:]
 
-	var supplier ReaderSupplier
-	if len(inputFiles) == 0 {
-		supplier = &StdinSupplier{}
-	} else {
-		supplier = &FileSupplier{filenames: inputFiles}
+	reader := io.Reader(os.Stdin)
+	if len(inputFiles) > 0 {
+		reader = openFiles(inputFiles)
 	}
+	scanner := bufio.NewScanner(reader)
 
 	producer, err := NewBufferedProducer(stream, *kinesis.New(nil), MaxSendSize)
 	if err != nil {
 		log.Fatalln("error:", err)
 	}
 
-	scanner := NewMultiScanner(supplier)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(line) > 0 {
@@ -80,4 +81,19 @@ func runCat(args []string) {
 	}
 
 	handleErrs(producer.Flush())
+}
+
+// NOTE: If this returns err the files aren't closed. That's kewl, the program
+// is about to exit anyway.
+func openFiles(filenames []string) io.Reader {
+	files := make([]io.Reader, len(filenames))
+	for i, name := range filenames {
+		f, err := os.Open(name)
+		if err != nil {
+			log.Fatalln("ktk cat: error:", err)
+			return nil // unreachable
+		}
+		files[i] = f
+	}
+	return io.MultiReader(files...)
 }
