@@ -24,6 +24,7 @@ type Command struct {
 var commands = []*Command{
 	catCommand,
 	listCommand,
+	tailCommand,
 }
 
 func usage() {
