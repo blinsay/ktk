@@ -49,7 +49,7 @@ func handleErrs(failures []FailedPut, err error) {
 // passed, data is sent from Stdin.
 func runCat(args []string) {
 	if len(args) < 1 {
-		log.Fatalln("error: no stream name given")
+		log.Fatalln("ktk cat: no stream name given")
 	}
 
 	stream := args[0]
