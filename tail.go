@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/awslabs/aws-sdk-go/aws"
-	"github.com/awslabs/aws-sdk-go/aws/awsutil"
 	"github.com/awslabs/aws-sdk-go/service/kinesis"
 )
 
@@ -26,14 +23,16 @@ func doTail(args []string) {
 	}
 
 	stream := args[0]
-	client := kinesis.New(nil)
+	consumer := NewConsumer(kinesis.New(nil))
 
-	resp, err := client.DescribeStream(&kinesis.DescribeStreamInput{
-		StreamName: aws.String(stream),
+	lines := make(chan string)
+	consumer.TailFunc(stream, func(records []*kinesis.Record) {
+		for _, r := range records {
+			lines <- string(r.Data)
+		}
 	})
-	if err != nil {
-		log.Fatalf("error: %#v\n", err)
-	}
 
-	fmt.Println(awsutil.StringValue(resp))
+	for {
+		log.Println(<-lines)
+	}
 }

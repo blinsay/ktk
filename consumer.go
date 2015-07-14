@@ -3,7 +3,12 @@ package main
 // FIXME: support resharding
 // FIXME: suppot consuming from a checkpoint
 
-import "github.com/awslabs/aws-sdk-go/service/kinesis"
+import (
+	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/awslabs/aws-sdk-go/service/kinesis"
+)
 
 // A record processor. Passed to a Consumer and used to process all of the
 // incoming records on a stream. The same processor will be called multiple
@@ -29,12 +34,16 @@ func (p ProcessorFunc) Process(records []*kinesis.Record) {
 // the shard state of the streams it processes and handles splits and merges
 // while ensuring that all records are processed in order.
 type Consumer struct {
-	client kinesis.Kinesis
+	client *kinesis.Kinesis
 }
 
 // Return a new Consumer.
-func NewConsumer(client kinesis.Kinesis) *Consumer {
+func NewConsumer(client *kinesis.Kinesis) *Consumer {
 	return &Consumer{client}
+}
+
+func (c *Consumer) TailFunc(stream string, processor ProcessorFunc) {
+	c.Tail(stream, processor)
 }
 
 // Process the given stream starting from the LATEST record. Returns an error if
@@ -46,22 +55,30 @@ func (c *Consumer) Tail(stream string, processor Processor) error {
 	}
 
 	for _, shard := range shards {
-		consumer := &shardConsumer{
+		s := &shardConsumer{
+			client:    c.client,
 			stream:    stream,
 			shard:     shard,
 			processor: processor,
 		}
-		go consumer.consume()
-	}
-	return nil
 
+		go func(s *shardConsumer) {
+			s.getLatestIterator()
+			s.consume()
+		}(s)
+	}
+
+	return nil
 }
 
 func (c *Consumer) activeShards(stream string) ([]string, error) {
-	desc, err := describeStream(c.client, stream)
+	resp, err := c.client.DescribeStream(&kinesis.DescribeStreamInput{
+		StreamName: aws.String(stream),
+	})
 	if err != nil {
 		return nil, err
 	}
+	desc := resp.StreamDescription
 
 	// TODO: handle the case where a merge/split has happened in the last 24h
 	shards := make([]string, len(desc.Shards))
@@ -71,30 +88,45 @@ func (c *Consumer) activeShards(stream string) ([]string, error) {
 	return shards, nil
 }
 
-func describeStream(client kinesis.Kinesis, stream string) (*kinesis.StreamDescription, error) {
-	return nil, nil
-}
-
 // A shardConsumer reads records from a single shard in a Kinesis stream.
 type shardConsumer struct {
+	client        *kinesis.Kinesis
 	stream        string
 	shard         string
+	shardIterator *string
 	processor     Processor
-	shardIterator string
 }
 
-// Consume the entirety of a Kinesis shard, passing all records to
-func (c *shardConsumer) consume() {
-	for {
-		c.getNextIterator()
-		c.processor.Process(c.getRecords())
+func (s *shardConsumer) getLatestIterator() {
+	resp, err := s.client.GetShardIterator(&kinesis.GetShardIteratorInput{
+		StreamName:        aws.String(s.stream),
+		ShardID:           aws.String(s.shard),
+		ShardIteratorType: aws.String("LATEST"),
+	})
+	if err != nil {
+		// FIXME: figure out how to return errors here
+		panic(err)
 	}
+	s.shardIterator = resp.ShardIterator
 }
 
-func (c *shardConsumer) getNextIterator() {
-	// FIXME
-}
+func (s *shardConsumer) consume() {
+	for {
+		// Kinesis has a hard limit of 5 transactions per second per shard. Try
+		// not to violate that by reading too fast.
+		throttle := time.After(200 * time.Millisecond)
 
-func (c *shardConsumer) getRecords() []*kinesis.Record {
-	return nil
+		resp, err := s.client.GetRecords(&kinesis.GetRecordsInput{
+			ShardIterator: s.shardIterator,
+		})
+		if err != nil {
+			// FIXME: figure out how to return errors here
+			panic(err)
+		}
+
+		s.shardIterator = resp.NextShardIterator
+		s.processor.Process(resp.Records)
+
+		<-throttle
+	}
 }
