@@ -13,7 +13,6 @@ var listCommand = &Command{
 	Usage: "list",
 	Short: "list Kinesis streams",
 	Description: `
-
 	List the Kinesis streams associated with your account.
 	`,
 	Run: runList,

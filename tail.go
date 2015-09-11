@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/awslabs/aws-sdk-go/service/kinesis"
@@ -12,7 +13,7 @@ var tailCommand = &Command{
 	Short: "print data from the given stream",
 	Description: `
 	Tail the given Kinesis stream and print data to stdout. Functions like a
-	tail -f for Kinesis.
+	tail -f for Kinesis. Each message is printed on a new line.
 	`,
 	Run: doTail,
 }
@@ -33,6 +34,6 @@ func doTail(args []string) {
 	})
 
 	for {
-		log.Println(<-lines)
+		fmt.Println(<-lines)
 	}
 }

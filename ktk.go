@@ -30,7 +30,7 @@ var commands = []*Command{
 func usage() {
 	log.Println("usage: ktk command [arguments...]")
 	log.Println()
-	log.Println("Valid commands:")
+	log.Println("commands:")
 
 	for _, cmd := range commands {
 		log.Printf("\t%s\t%s\n", cmd.Name, cmd.Short)
@@ -46,6 +46,20 @@ func main() {
 	args := flag.Args()
 
 	if len(args) < 1 {
+		usage()
+		return
+	}
+
+	if args[0] == "help" {
+		if len(args) > 1 {
+			for _, cmd := range commands {
+				if cmd.Name == args[1] {
+					log.Printf("ktk %s\n%s", cmd.Usage, cmd.Description)
+					return
+				}
+			}
+		}
+
 		usage()
 		return
 	}
