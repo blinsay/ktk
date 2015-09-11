@@ -83,7 +83,7 @@ func (c *Consumer) activeShards(stream string) ([]string, error) {
 	// TODO: handle the case where a merge/split has happened in the last 24h
 	shards := make([]string, len(desc.Shards))
 	for i, shard := range desc.Shards {
-		shards[i] = *shard.ShardID
+		shards[i] = *shard.ShardId
 	}
 	return shards, nil
 }
@@ -100,7 +100,7 @@ type shardConsumer struct {
 func (s *shardConsumer) getLatestIterator() {
 	resp, err := s.client.GetShardIterator(&kinesis.GetShardIteratorInput{
 		StreamName:        aws.String(s.stream),
-		ShardID:           aws.String(s.shard),
+		ShardId:           aws.String(s.shard),
 		ShardIteratorType: aws.String("LATEST"),
 	})
 	if err != nil {

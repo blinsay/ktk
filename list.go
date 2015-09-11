@@ -5,8 +5,7 @@ package main
 import (
 	"log"
 
-	"github.com/awslabs/aws-sdk-go/aws"
-	"github.com/awslabs/aws-sdk-go/service/kinesis"
+	"github.com/aws/aws-sdk-go/service/kinesis"
 )
 
 var listCommand = &Command{
@@ -25,11 +24,8 @@ func runList(args []string) {
 	// Ignore args
 
 	streams, err := listStreams(kinesis.New(nil))
-	if awserr := aws.Error(err); awserr != nil {
-		log.Fatalf("error: %s: %s", awserr.Code, awserr.Message)
-	}
 	if err != nil {
-		log.Fatalln("kinesis client error:", err)
+		log.Fatalln("error:", err)
 	}
 
 	for _, stream := range streams {

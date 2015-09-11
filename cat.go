@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/service/kinesis"
 )
 
@@ -24,12 +23,6 @@ var catCommand = &Command{
 // Handle any errors from producer.Put and maybe log them and exit. Is a no-op
 // if there were no failures.
 func handleErrs(failures []FailedPut, err error) {
-	if awserr := aws.Error(err); awserr != nil {
-		if len(awserr.Message) > 0 {
-			log.Fatalln("aws error:", awserr.Message)
-		}
-		log.Fatalf("aws error:", awserr.Code)
-	}
 	if err != nil {
 		log.Fatalln("error:", err)
 	}
