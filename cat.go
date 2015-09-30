@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/kinesis"
 )
 
 var catCommand = &Command{
