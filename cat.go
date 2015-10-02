@@ -25,8 +25,9 @@ var catCommand = &Command{
 // if there were no failures.
 func handleErrs(failures []FailedPut, err error) {
 	if err != nil {
-		log.Fatalln("error:", err)
+		logFatalAwsErr(err)
 	}
+
 	if failures != nil {
 		errCounts := make(map[string]int)
 		for _, e := range failures {
@@ -46,7 +47,7 @@ func handleErrs(failures []FailedPut, err error) {
 // passed, data is sent from Stdin.
 func runCat(args []string) {
 	if len(args) < 1 {
-		log.Fatalln("ktk cat: no stream name given")
+		log.Fatalln("error: no stream name given")
 	}
 
 	stream := args[0]
@@ -60,7 +61,7 @@ func runCat(args []string) {
 
 	producer, err := NewBufferedProducer(stream, *kinesis.New(nil), MaxSendSize)
 	if err != nil {
-		log.Fatalln("error:", err)
+		logFatalAwsErr(err)
 	}
 
 	for scanner.Scan() {
@@ -84,7 +85,7 @@ func openFiles(filenames []string) io.Reader {
 	for i, name := range filenames {
 		f, err := os.Open(name)
 		if err != nil {
-			log.Fatalln("ktk cat: error:", err)
+			log.Fatalln("error:", err)
 			return nil // unreachable
 		}
 		files[i] = f

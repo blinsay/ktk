@@ -3,7 +3,16 @@ package main
 import (
 	"flag"
 	"log"
+
+	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws/awserr"
 )
+
+func logFatalAwsErr(err error) {
+	if awsErr, ok := err.(awserr.Error); ok {
+		log.Fatalf("aws error: %s", awsErr.Message())
+	}
+	log.Fatalln("error:", err)
+}
 
 // A ktk sub-command to run. (e.g. cat)
 type Command struct {
