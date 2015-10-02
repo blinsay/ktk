@@ -155,6 +155,13 @@ func (b *BufferedProducer) Flush() ([]FailedPut, error) {
 	return b.send()
 }
 
+func (b *BufferedProducer) reset() {
+	b.messages = make([]KinesisMessage, b.SendSize)
+	b.partitionKeys = make([]*string, b.SendSize)
+	b.values = make([][]byte, b.SendSize)
+	b.current = 0
+}
+
 func (b *BufferedProducer) send() ([]FailedPut, error) {
 	// Don't send with no data.
 	if b.current == 0 {
@@ -174,15 +181,7 @@ func (b *BufferedProducer) send() ([]FailedPut, error) {
 		Records:    entries,
 	}
 
-	// Make sure that resetting the producer state happens after every send.
-	// FIXME: do this even when a panic happens? recover?
-	defer func() {
-		b.messages = make([]KinesisMessage, b.SendSize)
-		b.partitionKeys = make([]*string, b.SendSize)
-		b.values = make([][]byte, b.SendSize)
-		b.current = 0
-	}()
-
+	defer b.reset()
 	result, err := b.client.PutRecords(input)
 	// There was a client error. Every message failed to get put. Return them
 	// all with no ErrorCode or ErrorMessage set. The client error is returned
