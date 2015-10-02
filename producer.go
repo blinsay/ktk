@@ -56,7 +56,7 @@ type Producer interface {
 	//
 	// If this put triggers sending messages to Kinesis, any number of messages
 	// previously passed to this client may fail and be returned.
-	Put(KinesisMessage) ([]*FailedPut, error)
+	Put(KinesisMessage) ([]FailedPut, error)
 }
 
 // A producer that buffers data internally and sends one a batch of messages
