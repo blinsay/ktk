@@ -2,12 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
 
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/blinsay/ktk/producer"
 )
 
 var catCommand = &Command{
@@ -23,21 +22,10 @@ var catCommand = &Command{
 
 // Handle any errors from producer.Put and maybe log them and exit. Is a no-op
 // if there were no failures.
-func handleErrs(failures []FailedPut, err error) {
+func handleErrs(err error) {
 	if err != nil {
 		logFatalAwsErr(err)
 	}
-
-	if failures != nil {
-		errCounts := make(map[string]int)
-		for _, e := range failures {
-			errCounts[*e.ErrorCode]++
-		}
-		fmt.Println("error map: ", errCounts)
-		log.Fatalf("%d puts failed: %+v\n", len(failures), errCounts)
-	}
-
-	// Do nothing
 }
 
 // Run the cat command with the given arguments.
@@ -59,15 +47,11 @@ func runCat(args []string) {
 	}
 	scanner := bufio.NewScanner(reader)
 
-	producer, err := NewBufferedProducer(stream, *kinesis.New(nil), MaxSendSize)
-	if err != nil {
-		logFatalAwsErr(err)
-	}
-
+	p := producer.New(stream)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(line) > 0 {
-			handleErrs(producer.Put(StringMessage(line)))
+			handleErrs(p.PutString(line))
 		}
 	}
 
@@ -75,7 +59,7 @@ func runCat(args []string) {
 		log.Fatalln("error:", err)
 	}
 
-	handleErrs(producer.Flush())
+	handleErrs(p.Flush())
 }
 
 // NOTE: If this returns err the files aren't closed. That's kewl, the program
