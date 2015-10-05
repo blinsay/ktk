@@ -1,6 +1,9 @@
 {
 	"ImportPath": "github.com/blinsay/ktk",
 	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/aws",
@@ -36,6 +39,14 @@
 			"ImportPath": "github.com/aws/aws-sdk-go/service/kinesis",
 			"Comment": "v0.9.10",
 			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/errwrap",
+			"Rev": "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/go-multierror",
+			"Rev": "d30f09973e19c1dfcd120b2d9c4f168e68d6b5d5"
 		},
 		{
 			"ImportPath": "github.com/vaughan0/go-ini",
