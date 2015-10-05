@@ -2,6 +2,7 @@ package producer
 
 import (
 	"errors"
+	"log"
 	"time"
 	"unicode/utf8"
 
@@ -36,15 +37,17 @@ type message struct {
 //
 // Individual record failures will be automatically retried with an exponential
 // backoff until they succeed. This is useful in `ktk cat` where it's sane to
-// just log a message to the user and keep trying, but may not be ideal for
-// other use cases.
+// just log a message to the user using the default logger and keep trying, but
+// may not be ideal for other use cases.
 //
 // Producers cannot be safely used by multiple goroutines. Callers should
 // synchronize access.
 type Producer struct {
 	StreamName string
 	SendSize   int
-	Throttle   func() Throttle
+
+	Throttle func() Throttle
+	Debug    bool
 
 	client   kinesisClient
 	current  int
@@ -153,10 +156,16 @@ func (p *Producer) send() error {
 		}
 
 		if *res.FailedRecordCount == 0 {
+			if p.Debug {
+				log.Printf("Put %d message(s).", len(res.Records))
+			}
 			return nil
 		}
 
 		messages = failedMessages(messages, res.Records)
+		if p.Debug {
+			log.Printf("Put failed for %d message(s). Backing off and trying again.", *res.FailedRecordCount)
+		}
 		p.Throttle().Await()
 	}
 	return nil

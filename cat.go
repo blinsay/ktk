@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/blinsay/ktk/producer"
 )
@@ -28,6 +29,16 @@ func handleErrs(err error) {
 	}
 }
 
+// Return true if the given env variable is set to a truthy value. See
+// strconv.ParseBool for truthy values.
+func envBool(name string) bool {
+	b, e := strconv.ParseBool(os.Getenv(name))
+	if e != nil {
+		return false
+	}
+	return b
+}
+
 // Run the cat command with the given arguments.
 //
 // The name of the stream to send data to is required. Any other arguments are
@@ -48,6 +59,8 @@ func runCat(args []string) {
 	scanner := bufio.NewScanner(reader)
 
 	p := producer.New(stream)
+	p.Debug = envBool("KTK_VERBOSE")
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(line) > 0 {
