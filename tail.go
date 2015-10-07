@@ -14,7 +14,10 @@ var tailCommand = &Command{
 	Short: "print data from the given stream",
 	Description: `
 	Tail the given Kinesis stream and print data to stdout. Functions like a
-	tail -f for Kinesis. Each message is printed on a new line.
+	tail -f for Kinesis. Only the data from each Kinesis Record is printed.
+
+	Tail follows a stream from the LATEST record. It handles reading through a
+	stream split or merge.
 	`,
 	Run: doTail,
 }

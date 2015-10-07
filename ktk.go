@@ -55,10 +55,12 @@ var commands = []*Command{
 	tailCommand,
 }
 
+const usageHeader = `usage: ktk command [arguments...]
+
+	help	show help for an individual command`
+
 func usage() {
-	log.Println("usage: ktk command [arguments...]")
-	log.Println()
-	log.Println("commands:")
+	log.Println(usageHeader)
 
 	for _, cmd := range commands {
 		log.Printf("\t%s\t%s\n", cmd.Name, cmd.Short)

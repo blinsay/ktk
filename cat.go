@@ -16,6 +16,10 @@ var catCommand = &Command{
 	Description: `
 	Sends data to the specified Kinesis stream one line at a time. If the names of
 	files are given as arguments, they're opened and read in order.
+
+	Cat sends data as fast as possible, using the first 256 characters of the
+	string as the partition key. Any throughput errors are automatically retried
+	until data is sent successfully.
 	`,
 	Run: runCat,
 }
