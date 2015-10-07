@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/blinsay/ktk/consumer"
 )
 
 var tailCommand = &Command{
@@ -24,14 +25,14 @@ func doTail(args []string) {
 	}
 
 	stream := args[0]
-	consumer := NewConsumer(kinesis.New(nil))
-
 	lines := make(chan string)
-	consumer.TailFunc(stream, func(records []*kinesis.Record) {
-		for _, r := range records {
-			lines <- string(r.Data)
+
+	err := consumer.Tail(stream, envBool(VERBOSE), func(records []*kinesis.Record) {
+		for _, record := range records {
+			lines <- string(record.Data)
 		}
 	})
+	fatalOnErr(err)
 
 	for {
 		fmt.Println(<-lines)
