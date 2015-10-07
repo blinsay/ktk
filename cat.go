@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/blinsay/ktk/producer"
 )
@@ -19,24 +18,6 @@ var catCommand = &Command{
 	files are given as arguments, they're opened and read in order.
 	`,
 	Run: runCat,
-}
-
-// Handle any errors from producer.Put and maybe log them and exit. Is a no-op
-// if there were no failures.
-func handleErrs(err error) {
-	if err != nil {
-		logFatalAwsErr(err)
-	}
-}
-
-// Return true if the given env variable is set to a truthy value. See
-// strconv.ParseBool for truthy values.
-func envBool(name string) bool {
-	b, e := strconv.ParseBool(os.Getenv(name))
-	if e != nil {
-		return false
-	}
-	return b
 }
 
 // Run the cat command with the given arguments.
@@ -59,12 +40,12 @@ func runCat(args []string) {
 	scanner := bufio.NewScanner(reader)
 
 	p := producer.New(stream)
-	p.Debug = envBool("KTK_VERBOSE")
+	p.Debug = envBool(VERBOSE)
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(line) > 0 {
-			handleErrs(p.PutString(line))
+			fatalOnErr(p.PutString(line))
 		}
 	}
 
@@ -72,7 +53,7 @@ func runCat(args []string) {
 		log.Fatalln("error:", err)
 	}
 
-	handleErrs(p.Flush())
+	fatalOnErr(p.Flush())
 }
 
 // NOTE: If this returns err the files aren't closed. That's kewl, the program

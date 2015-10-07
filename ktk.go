@@ -3,11 +3,30 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws/awserr"
 )
 
-func logFatalAwsErr(err error) {
+const VERBOSE = "KTK_VERBOSE"
+
+// Return true if the given env variable is set to a truthy value. See
+// strconv.ParseBool for truthy values.
+func envBool(name string) bool {
+	b, e := strconv.ParseBool(os.Getenv(name))
+	if e != nil {
+		return false
+	}
+	return b
+}
+
+// log.Fatalln on any non-nil error. Pretty print any AWS errors.
+func fatalOnErr(err error) {
+	if err == nil {
+		return
+	}
+
 	if awsErr, ok := err.(awserr.Error); ok {
 		log.Fatalf("aws error: %s", awsErr.Message())
 	}

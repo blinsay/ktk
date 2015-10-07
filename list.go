@@ -23,9 +23,7 @@ func runList(args []string) {
 	// Ignore args
 
 	streams, err := listStreams(kinesis.New(nil))
-	if err != nil {
-		logFatalAwsErr(err)
-	}
+	fatalOnErr(err)
 
 	for _, stream := range streams {
 		log.Println(stream)
