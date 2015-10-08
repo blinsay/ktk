@@ -57,7 +57,7 @@ var commands = []*Command{
 
 const usageHeader = `usage: ktk command [arguments...]
 
-	help	show help for an individual command`
+	help	Show help for an individual command`
 
 func usage() {
 	log.Println(usageHeader)

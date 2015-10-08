@@ -12,7 +12,7 @@ import (
 var catCommand = &Command{
 	Name:  "cat",
 	Usage: "cat stream [file...]",
-	Short: "send data to a Kinesis stream",
+	Short: "Send data to a Kinesis stream",
 	Description: `
 	Sends data to the specified Kinesis stream one line at a time. If the names of
 	files are given as arguments, they're opened and read in order.

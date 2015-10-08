@@ -1,15 +1,17 @@
+# ktk - Treat a Kinesis stream like a file
+
 `ktk` is a command line tool for interacting with Kinesis like it's a file. See
-`ktk help` for a list of individual commands, and `ktk help command` for
-information on a particular command.
+`ktk help` for a list of subcommands, and `ktk help command` for information on
+a particular subcommand.
 
 ```
 $ ktk help
 usage: ktk command [arguments...]
 
-	help	show help on an individual command
-	cat	send data to a Kinesis stream
-	list	list Kinesis streams
-	tail	print data from the given stream
+	help	Show help for an individual command
+	cat	  Send data to a Kinesis stream
+	list	List Kinesis streams
+	tail	Print data from the given stream
 ```
 
 #### AWS Credentials
@@ -20,7 +22,8 @@ you're good to go.
 
 #### Install
 
-Download a binary from the Release tab on Github!
+Download a binary from the [`Release`](https://github.com/blinsay/ktk/releases)
+tab on Github!
 
 #### Install from Source
 
@@ -28,3 +31,8 @@ Install `ktk` from source with the Go toolchain:
 
 `go install github.com/blinsay/ktk`
 
+## License
+
+&copy; Copyright Ben Linsay 2015.
+
+[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.00)

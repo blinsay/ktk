@@ -11,7 +11,7 @@ import (
 var listCommand = &Command{
 	Name:  "list",
 	Usage: "list",
-	Short: "list Kinesis streams",
+	Short: "List Kinesis streams",
 	Description: `
 	List the Kinesis streams associated with your account.
 	`,

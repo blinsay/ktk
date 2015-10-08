@@ -11,7 +11,7 @@ import (
 var tailCommand = &Command{
 	Name:  "tail",
 	Usage: "tail stream-name",
-	Short: "print data from the given stream",
+	Short: "Print data from the given stream",
 	Description: `
 	Tail the given Kinesis stream and print data to stdout. Functions like a
 	tail -f for Kinesis. Only the data from each Kinesis Record is printed.
