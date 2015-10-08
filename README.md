@@ -8,10 +8,10 @@ a particular subcommand.
 $ ktk help
 usage: ktk command [arguments...]
 
-	help	Show help for an individual command
-	cat	  Send data to a Kinesis stream
-	list	List Kinesis streams
-	tail	Print data from the given stream
+	help    Show help for an individual command
+	cat     Send data to a Kinesis stream
+	list    List Kinesis streams
+	tail    Print data from the given stream
 ```
 
 #### AWS Credentials
