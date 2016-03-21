@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
 const VERBOSE = "KTK_VERBOSE"

@@ -5,7 +5,7 @@ package main
 import (
 	"log"
 
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/aws/aws-sdk-go/service/kinesis"
 )
 
 var listCommand = &Command{

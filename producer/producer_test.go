@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws"
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/kinesis"
-	"github.com/blinsay/ktk/Godeps/_workspace/src/github.com/hashicorp/go-multierror"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/hashicorp/go-multierror"
 )
 
 const TestStream = "test"

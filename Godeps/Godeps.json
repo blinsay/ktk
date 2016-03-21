@@ -1,12 +1,63 @@
 {
 	"ImportPath": "github.com/blinsay/ktk",
-	"GoVersion": "go1.4.2",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/aws",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/awserr",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/awsutil",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/corehandlers",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/credentials",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/defaults",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/ec2metadata",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/request",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/service",
+			"Comment": "v0.9.10",
+			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
+		},
+		{
+			"ImportPath": "github.com/aws/aws-sdk-go/aws/service/serviceinfo",
 			"Comment": "v0.9.10",
 			"Rev": "661aeb3339ad9bd5fd420752ebf18a651d40413e"
 		},
