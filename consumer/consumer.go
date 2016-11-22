@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/service/kinesis"
 )
 
@@ -41,9 +42,12 @@ type Consumer struct {
 //
 // Each shard will be processed in an individual goroutine.
 func Tail(stream string, debug bool, processor Processor) error {
+	config := defaults.DefaultConfig.Copy().
+		WithMaxRetries(2)
+
 	c := &Consumer{
 		stream:    aws.String(stream),
-		client:    kinesis.New(nil),
+		client:    kinesis.New(config),
 		processor: processor,
 
 		debug: debug,
