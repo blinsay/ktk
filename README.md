@@ -1,5 +1,7 @@
 # ktk - Treat a Kinesis stream like a file
 
+*NOTE: macOS Sierra users should upgrade to v1.0.1*
+
 `ktk` is a command line tool for interacting with Kinesis like it's a file. See
 `ktk help` for a list of subcommands, and `ktk help command` for information on
 a particular subcommand.
